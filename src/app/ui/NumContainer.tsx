@@ -12,7 +12,7 @@ export default function NumContainer({nums, highlighted = []}: NumContainerProps
                 {nums.map((item, index) => (
                     <div 
                         key={index} 
-                        className={`mx-1 rounded-sm ${highlighted.includes(index) ? "bg-red-500" : "bg-blue-500"} border border-black-300`}
+                        className={`rounded-sm ${highlighted.includes(index) ? "bg-red-500" : "bg-blue-500"} border border-black-300`}
                         style={{
                             height:`${item}%`,
                             width: `${100 / nums.length}%`
