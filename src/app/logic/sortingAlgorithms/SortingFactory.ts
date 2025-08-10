@@ -1,90 +1,130 @@
-
-
 class SortingFactory {
     nums: number[];
-    setArr: (newArr: number[]) => void;
+    setArr: (arr: number[]) => void;
     setHighlighted: (indices: number[]) => void;
     incrementComparisons: () => void;
     delay: number;
-    constructor(nums: number[], setArr: (newArr: number[]) => void, setHighlighted: (indices: number[]) => void, incrementComparisons: () => void, delay: number){
+
+    constructor(
+        nums: number[],
+        setArr: (arr: number[]) => void,
+        setHighlighted: (indices: number[]) => void,
+        incrementComparisons: () => void,
+        delay: number
+    ) {
         this.nums = nums;
         this.setArr = setArr;
         this.setHighlighted = setHighlighted;
         this.incrementComparisons = incrementComparisons;
         this.delay = delay;
     }
-    async bubbleSort() {
-        const newArr = [...this.nums]; // copy so we don't mutate props
 
-        for (let i = 0; i < newArr.length - 1; i++) {
-            for (let j = 0; j < newArr.length - i - 1; j++) {
-                this.setHighlighted([j+1]);
+    async loadArray() {
+        const highlighted: number[] = [];
+        for (let i = 0; i < this.nums.length; i++) {
+            highlighted.push(i);
+            this.setHighlighted([...highlighted]);
+            await new Promise((resolve) => setTimeout(resolve, this.delay));
+        }
+        this.setHighlighted([]);
+    }
+
+    async bubbleSort() {
+        for (let i = 0; i < this.nums.length - 1; i++) {
+            for (let j = 0; j < this.nums.length - i - 1; j++) {
+                this.setHighlighted([j, j + 1]);
                 this.incrementComparisons();
-                if (newArr[j] > newArr[j + 1]) {
-                    [newArr[j], newArr[j + 1]] = [newArr[j + 1], newArr[j]];
-                    this.setArr([...newArr]);
+                if (this.nums[j] > this.nums[j + 1]) {
+                    [this.nums[j], this.nums[j + 1]] = [this.nums[j + 1], this.nums[j]];
+                    this.setArr([...this.nums]);
                 }
                 await new Promise((resolve) => setTimeout(resolve, this.delay));
             }
         }
+        await this.loadArray();
         this.setHighlighted([]);
     }
-    async selectionSort() {
-        const newArr = [...this.nums];
-        const n = newArr.length;
 
+    async selectionSort() {
+        const n = this.nums.length;
         for (let i = 0; i < n - 1; i++) {
             let minIndex = i;
-
             for (let j = i + 1; j < n; j++) {
-                // Highlight the two elements being compared
                 this.setHighlighted([i, j]);
                 this.incrementComparisons();
                 await new Promise((resolve) => setTimeout(resolve, this.delay));
-
-                if (newArr[j] < newArr[minIndex]) {
+                if (this.nums[j] < this.nums[minIndex]) {
                     minIndex = j;
                 }
             }
-
             if (minIndex !== i) {
-                [newArr[i], newArr[minIndex]] = [newArr[minIndex], newArr[i]];
-                this.setArr([...newArr]);
+                [this.nums[i], this.nums[minIndex]] = [this.nums[minIndex], this.nums[i]];
+                this.setArr([...this.nums]);
                 await new Promise((resolve) => setTimeout(resolve, this.delay));
             }
         }
-
-        // Clear highlight after sorting
         this.setHighlighted([]);
     }
+
     async insertionSort() {
-    const newArr = [...this.nums];
-
-    for (let i = 1; i < newArr.length; i++) {
-        let j = i;
-
-        // Small delay for highlighting before comparisons
-        await new Promise((resolve) => setTimeout(resolve, this.delay));
-
-        while (j > 0) {
-            this.incrementComparisons(); // count the comparison in condition
-            this.setHighlighted([j - 1, j]);
-
-            if (newArr[j - 1] > newArr[j]) {
-                // Swap
-                [newArr[j], newArr[j - 1]] = [newArr[j - 1], newArr[j]];
-                this.setArr([...newArr]);
-                j--;
-                await new Promise((resolve) => setTimeout(resolve, this.delay));
-            } else {
-                break; // no more shifting needed
+        for (let i = 1; i < this.nums.length; i++) {
+            let j = i;
+            await new Promise((resolve) => setTimeout(resolve, this.delay));
+            while (j > 0) {
+                this.incrementComparisons();
+                this.setHighlighted([j - 1, j]);
+                if (this.nums[j - 1] > this.nums[j]) {
+                    [this.nums[j], this.nums[j - 1]] = [this.nums[j - 1], this.nums[j]];
+                    this.setArr([...this.nums]);
+                    j--;
+                    await new Promise((resolve) => setTimeout(resolve, this.delay));
+                } else {
+                    break;
+                }
             }
         }
+        this.setHighlighted([]);
     }
 
-    this.setHighlighted([]);
-}
+    async heapSort() {
+        const n = this.nums.length;
+        for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+            await this.heapify(this.nums, n, i);
+        }
+        for (let i = n - 1; i > 0; i--) {
+            [this.nums[0], this.nums[i]] = [this.nums[i], this.nums[0]];
+            this.setArr([...this.nums]);
+            this.setHighlighted([0, i]);
+            await new Promise((resolve) => setTimeout(resolve, this.delay));
+            await this.heapify(this.nums, i, 0);
+        }
+        await this.loadArray();
+        this.setHighlighted([]);
+    }
 
+    async heapify(arr: number[], n: number, i: number) {
+        let largest = i;
+        let left = 2 * i + 1;
+        let right = 2 * i + 2;
+
+        if (left < n) {
+            this.incrementComparisons();
+            this.setHighlighted([largest, left]);
+            if (arr[left] > arr[largest]) largest = left;
+        }
+        if (right < n) {
+            this.incrementComparisons();
+            this.setHighlighted([largest, right]);
+            if (arr[right] > arr[largest]) largest = right;
+        }
+        if (largest !== i) {
+            [arr[i], arr[largest]] = [arr[largest], arr[i]];
+            this.setArr([...this.nums]);
+            this.setHighlighted([i, largest]);
+            await new Promise((resolve) => setTimeout(resolve, this.delay));
+            await this.heapify(arr, n, largest);
+        }
+    }
 }
 
 export default SortingFactory;
