@@ -19,16 +19,14 @@ export default function Home() {
   const [arraySize, setArraySize] = useState<number>(50);
   const [delay, setDelay] = useState<number>(500);
   const [algorithmName, setAlgorithmName] = useState<string>("bubble");
+  
   const [sortingAlgorithm, setSortingAlgorithm] = useState<SortingAlgorithm>(
     new BubbleSort(nums, setNums, setHighlighted, () => setComparisons(prev => prev + 1), delay)
   );
-
-  // Increment comparisons helper
   const incrementComparisons = () => {
     setComparisons(prev => prev + 1);
   };
 
-  // Update sortingAlgorithm instance whenever nums, delay, or algorithmName change
   useEffect(() => {
     let algo: SortingAlgorithm;
     switch (algorithmName) {
