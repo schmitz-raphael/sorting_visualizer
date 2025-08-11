@@ -27,6 +27,7 @@ export default function Home() {
     setComparisons(prev => prev + 1);
   };
 
+
   useEffect(() => {
     let algo: SortingAlgorithm;
     switch (algorithmName) {
@@ -85,6 +86,10 @@ export default function Home() {
 
   return (
     <div>
+      <div className="flex justify-center align-center bg-gray-100">
+        <h1 className="text-4xl font-bold mb-4">Sorting Visualizer</h1>
+        <p className="text-lg mx-4 my-2">created by Raphael Schmitz</p>
+      </div>
       <div className="control-panel flex items-center p-4 bg-gray-200">
         <select
           className="selectedAlgorithm bg-white border border-gray-300 rounded p-2 mr-4"
